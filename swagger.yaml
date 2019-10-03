@@ -1,0 +1,1062 @@
+openapi: 3.0.0
+
+info:
+  title: "Customer Events Service"
+  description: "API to consume customer events"
+  version: "2.0.0"
+
+servers:
+  - url: https://api.dev.latitudefinancial.com/v1/customer-events-service
+    description: dev server
+  - url: https://api.test.latitudefinancial.com/v1/customer-events-service
+    description: test server
+
+paths:
+  /customers:
+    post:
+      summary: Send a customer event
+      description: The first event should be sent when the customer has been approved or rejected.
+        Future events should then be sent when any of the data changes.
+        Always send through the full payload, not a delta.
+      security:
+        - oAuth2ClientCredentials:
+            - origination/customer_event:submit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerEvent'
+      responses:
+        '201':
+          description: The event was consumed
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /applications:
+    post:
+      summary: Send an application event
+      description: The first event should be sent when the application has been approved or rejected.
+        Future events should then be sent when any of the data changes.
+        Always send through the full payload, not a delta.
+      security:
+        - oAuth2ClientCredentials:
+            - origination/application_event:submit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationEvent'
+      responses:
+        '201':
+          description: The event was consumed
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /accounts:
+    post:
+      summary: Send an account event
+      description: The first event should be sent when the account has been created.
+        Future events should then be sent when any of the data changes.
+        Always send through the full payload, not a delta.
+      security:
+        - oAuth2ClientCredentials:
+            - origination/account_event:submit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountEvent'
+      responses:
+        '201':
+          description: The event was consumed
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /plans:
+    post:
+      summary: Send a plan event
+      description: The first event should be sent when the plan has been created.
+        Future events should then be sent when any of the data changes.
+        Always send through the full payload, not a delta.
+      security:
+        - oAuth2ClientCredentials:
+            - origination/plan_event:submit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanEvent'
+      responses:
+        '201':
+          description: The event was consumed
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /transactions:
+    post:
+      summary: Send a transaction event
+      description: The event should be sent whenever there's a transaction happened.
+        Always send through the full payload, not a delta.
+      security:
+        - oAuth2ClientCredentials:
+            - origination/transaction_event:submit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionEvent'
+      responses:
+        '201':
+          description: The event was consumed
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  securitySchemes:
+    oAuth2ClientCredentials:
+      type: oauth2
+      description: he response from the tokenUrl will contain an access token, the duration it is valid for and
+        the type of token. The access token should be sent in the Authorization header for all protected APIs.
+        See https://www.oauth.com/oauth2-servers/access-tokens/client-credentials/ for more information about
+        the client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth2/token
+          scopes:
+            origination/customer_event:submit: Grants access to submit customer events.
+            origination/application_event:submit: Grants access to submit application events.
+            origination/account_event:submit: Grants access to submit account events.
+            origination/plan_event:submit: Grants access to submit plan events.
+            origination/transaction_event:submit: Grants access to submit transaction events.
+
+  schemas:
+    CustomerEvent:
+      properties:
+        sourceSystem:
+          description: System where event is being generated.
+          type: string
+          example: "PARTNER1"
+        id:
+          type: string
+          description: Customer ID from the source system.
+          example: "12345"
+        type:
+          description: "Customer is an individual or a business entity."
+          type: string
+          enum:
+            - "individual"
+            - "business"
+          example: "individual"
+        creationDateTime:
+          description: "Date and time of when the customer was created in the source system. Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-28T13:14:15.000Z"
+        lastUpdateDateTime:
+          description: "Date and time of when the customer was updated in the source system. Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-29T13:14:15.000Z"
+        gender:
+          type: string
+          enum:
+            - "male"
+            - "female"
+            - "other"
+            - "unknown"
+          example: "male"
+        dateOfBirth:
+          type: string
+          format: date
+          example: "1950-10-20"
+        individualName:
+          $ref: '#/components/schemas/Name'
+        customerStatus:
+          $ref: '#/components/schemas/CustomerStatus'
+        currentAddress:
+          $ref: '#/components/schemas/LegalAddress'
+        previousAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalAddress'
+        otherAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        contact:
+          $ref: '#/components/schemas/Contact'
+        identity:
+          $ref: '#/components/schemas/Identity'
+      required:
+        - sourceSystem
+        - id
+        - type
+        - creationDateTime
+        - lastUpdateDateTime
+        - gender
+        - dateOfBirth
+        - name
+        - currentAddress
+        - contact
+
+    ApplicationEvent:
+      properties:
+        sourceSystem:
+          description: System where event is being generated.
+          type: string
+          example: "PARTNER1"
+        id:
+          description: Application ID from the source system.
+          type: string
+          example: "12345"
+        customerRelationships:
+          description: "Defines the relationship between Application and Customer"
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerRelationship'
+        creationDateTime:
+          description: "Date and time of when the Application was created in the source system.
+            Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+        lastUpdateDateTime:
+          description: "Date and time of when the Application was last updated in the source system.
+            For the initial extract this should be the timestamp of extraction date-time.
+            Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+        status:
+          description: "Describes the current status of the Application"
+          type: string
+          enum:
+            - "approved"
+            - "assess"
+            - "cancelled"
+            - "conditionally_approved"
+            - "declined"
+            - "error"
+            - "refer_continue"
+            - "refer_error"
+            - "referred"
+            - "referred_fraud"
+            - "withdrawn"
+          example: "approved"
+        subStatus:
+          description: "Describes the sub-status of the Application"
+          type: string
+        product:
+          description: "Product applied for"
+          $ref: '#/components/schemas/Product'
+      required:
+        - sourceSystem
+        - id
+        - customerRelationships
+        - creationDateTime
+        - lastUpdateDateTime
+        - product
+
+    AccountEvent:
+      description: "An Account is a consolidation of all plans."
+      properties:
+        sourceSystem:
+          description: "System where event is being generated."
+          type: string
+          example: "PARTNER1"
+        id:
+          description: "Account ID from the source system."
+          type: string
+          example: "12345"
+        applicationId:
+          description: "Application ID from the source system that is associated to this Account."
+          type: string
+          example: "67890"
+        customerRelationships:
+          description: "Defines the  relationship between Account and Customer"
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerRelationship'
+        creationDateTime:
+          description: "Date and time of when the Account was created in the source system.
+            Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+        lastUpdateDateTime:
+          description: "Date and time of when the Account was last updated by the source system.
+            For the initial extract this should be the timestamp of extraction date-time.
+            Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15Z"
+        closedDateTime:
+          description: "Date and time of when the Account was closed in the source system.
+            Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+        balance:
+          description: "The remaining balance for the account"
+          type: number
+          example: 125.43
+        creditLimit:
+          description: "Total credit allocated to the Account."
+          type: number
+          example: 500.00
+        currency:
+          description: "Currency of the amounts this Account uses."
+          $ref: '#/components/schemas/Currency'
+        product:
+          description: "The product the Account belongs to."
+          $ref: '#/components/schemas/Product'
+        accountStatus:
+          description: "Current status of the account."
+          $ref: '#/components/schemas/AccountStatus'
+      required:
+        - sourceSystem
+        - id
+        - applicationId
+        - customerRelationships
+        - creationDateTime
+        - lastUpdateDateTime
+        - balance
+        - creditLimit
+        - currency
+        - product
+        - accountStatus
+
+    TransactionEvent:
+      properties:
+        sourceSystem:
+          description: System where event is being generated.
+          type: string
+          example: "PARTNER1"
+        id:
+          description: transaction ID from the source system.
+          type: string
+          example: "12345"
+        accountId:
+          description: account ID from which the transaction is made.
+          type: string
+          example: "12345"
+        planId:
+          description: plan ID from which the transaction is made.
+          type: string
+          example: "12345"
+        product:
+          $ref: '#/components/schemas/Product'
+        transactionCode:
+          type: string
+          example: "transactionCode"
+        effectiveDateTime:
+          description: "Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+        transactionAmount:
+          allOf:
+            - $ref: '#/components/schemas/Amount'
+            - properties:
+                originalAmount:
+                  $ref: '#/components/schemas/Amount'
+        postingDateTime:
+          description: "Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+        channelCode:
+          type: string
+        debitOrCredit:
+          type: string
+          enum:
+            - debit
+            - credit
+          example: debit
+
+      required:
+        - sourceSystem
+        - id
+        - product
+        - accountID
+        - transactionCode
+        - effectiveDateTime
+        - transactionAmount
+        - postingDateTime
+        - debitOrCredit
+
+    PlanEvent:
+      properties:
+        sourceSystem:
+          description: System where event is being generated.
+          type: string
+          example: "PARTNER1"
+        id:
+          description: Plan ID from the source system.
+          type: string
+          example: "12345"
+        accountId:
+          description: Account ID from the source system.
+          type: string
+          example: "45678"
+        closedDateTime:
+          description: "Date and time the Plan was closed or paid-off."
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+        creationDateTime:
+          description: "Date and time of when the Plan was created in the source system."
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+        currency:
+          description: "Currency of the amounts this plan uses."
+          $ref: '#/components/schemas/Currency'
+        balance:
+          description: "The remaining balance for the plan"
+          type: number
+          example: 1000.00
+        repaymentTerm:
+          description: The numeric part of the repayment duration. e.g. For a repayment duration of 10 weeks, the value of this field should be 10.
+          type: integer
+          example: 10
+        repaymentTermPeriod:
+          description: The period part of the repayment duration. e.g. For a repayment duration of 10 weeks, the value if this field should be Weeks.
+          type: string
+          enum:
+            - "days"
+            - "weeks"
+            - "months"
+          example: "weeks"
+        repaymentFrequency:
+          description: How often repayments should be made for the plan.
+          type: string
+          enum:
+            - "daily"
+            - "weekly"
+            - "fortnightly"
+            - "monthly"
+            - "quarterly"
+          example: "weekly"
+        contractedRepaymentAmount:
+          description: "The amount the customer is contracted to repay every repayment frequency."
+          type: number
+          example: 30.00
+        delinquencyStatus:
+          $ref: '#/components/schemas/DelinquencyStatus'
+        planStatus:
+          $ref: '#/components/schemas/PlanStatus'
+        product:
+          $ref: '#/components/schemas/Product'
+        lastUpdateDateTime:
+          description: "Date and time of when the Plan was last updated by the source system. Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+      required:
+        - sourceSystem
+        - id
+        - approvedDate
+        - creationDateTime
+        - contractedRepaymentAmount
+        - currency
+        - accountId
+        - balance
+        - delinquencyStatus
+        - product
+        - lastUpdateDateTime
+
+    AccountStatus:
+      properties:
+        hasFinancialCounselor:
+          type: boolean
+          example: false
+        isChargedOff:
+          type: boolean
+          example: false
+        isClosed:
+          type: boolean
+          example: false
+        isDormant:
+          type: boolean
+          example: false
+        isFraudulent:
+          type: boolean
+          example: true
+        isInDispute:
+          type: boolean
+          example: false
+        isInHardship:
+          type: boolean
+          example: false
+        isOpen:
+          type: boolean
+          example: false
+        isSold:
+          type: boolean
+          example: false
+        lastUpdateDateTime:
+          description: "This should be updated every time AccountStatus is changed. Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+        status:
+          description: "Account status value as in the source system."
+          type: string
+          example: "active"
+      required:
+        - isChargedOff
+        - isClosed
+        - isOpen
+        - isSold
+        - lastUpdateDateTime
+        - status
+
+    CustomerStatus:
+      properties:
+        hasDefendedMatter:
+          description: "Has the customer defended a matter?"
+          type: boolean
+          example: false
+        hasFinancialCounselor:
+          description: "Does the customer have a financial counselor?"
+          type: boolean
+          example: false
+        isBankrupt:
+          description: "Is the customer bankrupt?"
+          type: boolean
+          example: true
+        bankruptDate:
+          description: "The date the customer became bankrupt."
+          type: string
+          format: date
+          example: "2018-12-31"
+        isChargedOff:
+          description: "Is the customers debt charged off?"
+          type: boolean
+          example: false
+        isDeceased:
+          description: "Is the customer deceased?"
+          type: boolean
+          example: false
+        deceasedDate:
+          description: "The date the customer became deceased."
+          type: string
+          format: date
+          example: "2018-12-31"
+        isFraudulent:
+          description: "Is the customer fraudulent? e.g. A fraudster has used the customers personal details to
+            sign up without the customers knowledge."
+          type: boolean
+          example: false
+        isInDispute:
+          description: "Is the customer in dispute?"
+          type: boolean
+          example: false
+        isInHardship:
+          description: "Is the customer in financial hardship?"
+          type: boolean
+          example: false
+        isInJailOrPrison:
+          description: "Is the customer in jail or prison?"
+          type: boolean
+          example: false
+        lastUpdateDateTime:
+          description: "Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+      required:
+        - lastUpdateDateTime
+
+    PlanStatus:
+      properties:
+        hasFinancialCounselor:
+          description: "Does the customer have a financial counsellor that is assisting with the plan?"
+          type: boolean
+          example: false
+        isChargedOff:
+          description: "Has the plan been charged off?"
+          type: boolean
+          example: false
+        isFraudulent:
+          description: "Is the plan fraudulent? e.g. A fraudster has created the plan."
+          type: boolean
+          example: true
+        isInDispute:
+          description: "Is the plan in dispute? e.g. The customer didn't receive the ordered goods."
+          type: boolean
+          example: false
+        isInHardship:
+          description: "Does the plan have a hardship arrangement?"
+          type: boolean
+          example: false
+        isOpen:
+          description: "Is the Plan still 'Open'. Plan cannot remain Open if associated Account is Closed or Sold."
+          type: boolean
+          example: true
+        isClosed:
+          description: "Is the Plan Closed."
+          type: boolean
+          example: false
+        isSold:
+          description: "Is the Plan Sold."
+          type: boolean
+          example: false
+        status:
+          description: "Plan status value as in the source system."
+          type: string
+          example: "active"
+        lastUpdateDateTime:
+          description: "Date and time of when the Plan was last updated by the source system. Value must be in UTC with no local offset as defined by RFC 3339, section 5.6"
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+      required:
+        - isOpen
+        - isClosed
+        - isSold
+        - status
+        - lastUpdateDateTime
+
+    LegalAddress:
+      properties:
+        type:
+          type: string
+          enum:
+            - "home"
+            - "registered"
+          example: "home"
+        addressLine1:
+          type: string
+          example: "Floor 4"
+        addressLine2:
+          type: string
+          example: "800 Collins Street"
+        adminArea3:
+          description: "Dependent locality (may be an inner-city district or a suburb)"
+          type: string
+          example: "Docklands"
+        adminArea2:
+          description: "City or Locality"
+          type: string
+          example: "Melbourne"
+        adminArea1:
+          description: "Administrative area such as a state, county, province, island etc"
+          type: string
+          example: "Victoria"
+        postcode:
+          type: string
+          example: "3008"
+        country:
+          type: string
+          example: "Australia"
+      required:
+        - type
+        - addressLine1
+        - adminArea1
+        - postcode
+        - country
+
+    Address:
+      properties:
+        type:
+          type: string
+          enum:
+            - "home"
+            - "mailing"
+            - "trading"
+            - "registered"
+            - "other"
+          example: "home"
+        addressLine1:
+          type: string
+          example: "Floor 4"
+        addressLine2:
+          type: string
+          example: "800 Collins Street"
+        adminArea3:
+          description: "Dependent locality (may be an inner-city district or a suburb)"
+          type: string
+          example: "Docklands"
+        adminArea2:
+          description: "City or Locality"
+          type: string
+          example: "Melbourne"
+        adminArea1:
+          description: "Administrative area such as a state, county, province, island etc"
+          type: string
+          example: "Victoria"
+        postcode:
+          type: string
+          example: "3008"
+        country:
+          type: string
+          example: "Australia"
+      required:
+        - type
+        - addressLine1
+        - adminArea1
+        - postcode
+        - country
+
+    Contact:
+      properties:
+        phoneNumbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhoneNumber'
+        emails:
+          type: array
+          items:
+            type: string
+            example: "example@example.com"
+      required:
+        - phoneNumbers
+
+    Currency:
+      type: string
+      enum:
+        - "AUD"
+        - "NZD"
+      example: "AUD"
+
+    CustomerRelationship:
+      properties:
+        customerId:
+          type: string
+          example: "1234"
+        partyRelationshipType:
+          description: "Describes the relationship of the Customer with Application/Account"
+          type: string
+          enum:
+            - "primary"
+            - "joint"
+            - "supplementary"
+            - "guarantor"
+          example: "primary"
+        partyRelationshipEndDate:
+          description: "Populate if the relationship between Customer and Application/Account has now ceased. e.g. Account Closed"
+          type: string
+          format: date
+      required:
+        - customerId
+        - partyRelationshipType
+
+    DriverLicence:
+      type: object
+      description: driver licence details
+      properties:
+        number:
+          type: string
+          example: "035611111"
+        expiryDate:
+          description: >-
+            The expiry date stated on the driver licence (it is required to be
+            in a full-date notation as defined by RFC 3339, section 5.6).
+          type: string
+          format: date
+          example: "2022-07-21"
+        version:
+          type: string
+          example: "2"
+      required:
+        - number
+
+    Identity:
+      type: object
+      description: identity of a person
+      properties:
+        driverLicence:
+          $ref: '#/components/schemas/DriverLicence'
+        passport:
+          $ref: '#/components/schemas/Passport'
+        other:
+          $ref: '#/components/schemas/OtherIdentity'
+
+    Name:
+      type: object
+      description: name of a person
+      properties:
+        title:
+          type: string
+          example: "Mr"
+        initials:
+          type: string
+          example: "JS"
+        firstName:
+          type: string
+          example: "John"
+        middleName:
+          type: string
+          example: "Cong"
+        lastName:
+          type: string
+          example: "Smith"
+      required:
+        - firstName
+        - lastName
+
+    OtherIdentity:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - "eighteen_plus_card"
+            - "emergency_travel_document"
+            - "international_driving_permit"
+            - "national_id_card"
+            - "nz_birth_certificate"
+            - "nz_certificate_of_citizenship"
+            - "nz_certificate_of_id"
+            - "nz_firearms_license"
+            - "nz_refugee_travel_document"
+            - "nz_residency_number"
+            - "other"
+            - "supergold_card_with_photo"
+          example: "national_id_card"
+        number:
+          type: string
+          example: "4567890"
+        expiryDate:
+          type: string
+          format: date
+          example: "2020-12-31"
+        version:
+          type: string
+          example: "1"
+        issuedBy:
+          type: string
+          example: "Australian Government"
+      required:
+        - type
+        - number
+
+    Passport:
+      description: passport information of the applicant
+      properties:
+        number:
+          type: string
+          example: "E00909034"
+        expiryDate:
+          description: >-
+            The expiry date stated on the passport (it is required to be
+            in a full-date notation as defined by RFC 3339, section 5.6).
+          type: string
+          format: date
+          example: "2022-07-21"
+      required:
+        - number
+
+    PhoneNumber:
+      properties:
+        type:
+          type: string
+          enum:
+            - "mobile"
+            - "home"
+            - "work"
+            - "business"
+            - "fax"
+            - "other"
+          example: "mobile"
+        country:
+          type: string
+          example: "+61"
+        area:
+          type: string
+          example: "03"
+        number:
+          type: string
+          example: "5550 1234"
+        extension:
+          type: string
+      required:
+        - type
+        - country
+        - area
+        - number
+
+    DelinquencyStatus:
+      properties:
+        numberOfDaysPastDue:
+          description: "The number of days past the payment due date. For non delinquent plans this can be set to 0."
+          type: integer
+          example: 1
+        numberOfRepaymentsPastDue:
+          description: "The number of repayments that are past their due dates. For non delinquent plans this can be set to 0."
+          type: integer
+          example: 1
+        delinquencyStatusChangeDateTime:
+          description: "The formats date and date-time are both supported (as defined by RFC 3339, section 5.6). If using date-time the value should be in UTC with no local offset."
+          type: string
+          format: date-time
+          example: "2019-05-30T13:14:15.000Z"
+      required:
+        - numberOfDaysPastDue
+        - numberOfRepaymentsPastDue
+
+    Product:
+      type: object
+      properties:
+        code:
+          description: "For events this is the product code as defined by the source system."
+          type: string
+          example: "P001AU"
+        subCode:
+          description: "For events this is the product sub code as defined by the source system."
+          type: string
+          example: "123"
+        countryCode:
+          description: "Legal jurisdiction under which the product is operated."
+          type: string
+          enum:
+            - "AU"
+            - "NZ"
+          example: "AU"
+      required:
+        - code
+        - countryCode
+
+    Amount:
+      type: object
+      properties:
+        currency:
+          $ref: '#/components/schemas/Currency'
+        amount:
+          type: number
+          format: double
+      required:
+         - amount
+         - currency
+
+    ErrorResponse:
+      description: list of errors that occurred during processing the request
+      properties:
+        statusCode:
+          type: number
+          example: 500
+          description: status code when errors returned
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+
+    Error:
+      description: an error that occurred during processing the request
+      properties:
+        title:
+          type: string
+        message:
+          type: string
